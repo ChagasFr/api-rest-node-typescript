@@ -15,15 +15,17 @@ export const create = async (req: Request<{}, {}, ICidade>, res: Response) => {
 
   try {
     validateData = await bodyValidation.validate(req.body);
-  } catch (error) {
-    const yupError = error as yup.ValidationError;
-    const ValidationErrors: Record<string, string> = {};
+  } catch (err) {
+    const yupError = err as yup.ValidationError;
+    const errors: Record<string, string> = {};
 
-    return res.status(StatusCodes.BAD_REQUEST).json({
-      errors: {
-        default: yupError.message,
-      },
+    yupError.inner.forEach((error) => {
+      if (!error.path) return;
+
+      errors[error.path] = error.message;
     });
+
+    return res.status(StatusCodes.BAD_REQUEST).json({ errors });
   }
 
   console.log(req.body.nome);
