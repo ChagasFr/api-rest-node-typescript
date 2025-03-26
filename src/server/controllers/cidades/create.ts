@@ -1,16 +1,17 @@
 import { Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import * as yup from "yup";
+import { validation } from "../../shared/middleware";
 
 interface ICidade {
   nome: string;
 }
 
-const bodyValidation: yup.SchemaOf<ICidade> = yup.object().shape({
+const bodyValidation: yup.ObjectSchema<ICidade> = yup.object().shape({
   nome: yup.string().required().min(3),
 });
 
-export const createBodyValidator: RequestHandler = async () => {
+export const createBodyValidator: RequestHandler = async (req, res, next) => {
   try {
     await bodyValidation.validate(req.body);
   } catch (err) {
@@ -31,11 +32,11 @@ interface IFilter {
   filter: string;
 }
 
-const queryValidation: yup.SchemaOf<IFilter> = yup.object().shape({
+const queryValidation: yup.ObjectSchema<IFilter> = yup.object().shape({
   nome: yup.string().required().min(3),
 });
 
-export const createQueryValidator: RequestHandler = async () => {
+export const createQueryValidator: RequestHandler = async (req, res, next) => {
   try {
     await queryValidation.validate(req.body);
   } catch (err) {
@@ -51,6 +52,8 @@ export const createQueryValidator: RequestHandler = async () => {
     return res.status(StatusCodes.BAD_REQUEST).json({ errors });
   }
 };
+
+export const createValidation = validation();
 
 export const create: RequestHandler = async (
   req: Request<{}, {}, ICidade>,
