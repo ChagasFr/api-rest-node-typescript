@@ -6,54 +6,20 @@ import { validation } from "../../shared/middleware";
 interface ICidade {
   nome: string;
 }
-
-const bodyValidation: yup.ObjectSchema<ICidade> = yup.object().shape({
-  nome: yup.string().required().min(3),
-});
-
-export const createBodyValidator: RequestHandler = async (req, res, next) => {
-  try {
-    await bodyValidation.validate(req.body);
-  } catch (err) {
-    const yupError = err as yup.ValidationError;
-    const errors: Record<string, string> = {};
-
-    yupError.inner.forEach((error) => {
-      if (!error.path) return;
-
-      errors[error.path] = error.message;
-    });
-
-    return res.status(StatusCodes.BAD_REQUEST).json({ errors });
-  }
-};
-
 interface IFilter {
   filter: string;
 }
+export const createBodyValidator = validation({
+  body: yup.object().shape({
+    nome: yup.string().required().min(3),
+    estado: yup.string().required().min(2),
+  }),
 
-const queryValidation: yup.ObjectSchema<IFilter> = yup.object().shape({
-  nome: yup.string().required().min(3),
+  query: yup.object().shape({
+    nome: yup.string().required().min(3),
+    estado: yup.string().required().min(2),
+  }),
 });
-
-export const createQueryValidator: RequestHandler = async (req, res, next) => {
-  try {
-    await queryValidation.validate(req.body);
-  } catch (err) {
-    const yupError = err as yup.ValidationError;
-    const errors: Record<string, string> = {};
-
-    yupError.inner.forEach((error) => {
-      if (!error.path) return;
-
-      errors[error.path] = error.message;
-    });
-
-    return res.status(StatusCodes.BAD_REQUEST).json({ errors });
-  }
-};
-
-export const createValidation = validation();
 
 export const create: RequestHandler = async (
   req: Request<{}, {}, ICidade>,

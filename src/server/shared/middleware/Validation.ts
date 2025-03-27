@@ -1,22 +1,29 @@
 import { RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
-import { ObjectSchema, ValidationError } from "yup";
+import { object, ObjectSchema, ValidationError } from "yup";
 
-type TValidation = (scheme: ObjectSchema<any>) => RequestHandler;
+type TProperty = "body" | "header" | "params" | "query";
 
-export const validation: TValidation = (scheme) => async (req, res, next) => {
-  try {
-    await scheme.validate(req.body);
-  } catch (err) {
-    const yupError = err as ValidationError;
-    const errors: Record<string, string> = {};
+type TAllSchemas = Record<TProperty, ObjectSchema<any>>;
 
-    yupError.inner.forEach((error) => {
-      if (!error.path) return;
+type TValidation = (schemas: Partial<TAllSchemas>) => RequestHandler;
 
-      errors[error.path] = error.message;
-    });
+export const validation: TValidation = (schemas) => async (req, res, next) => {
+  Object.entries(schemas).forEach(([key, schema]) => {
+    try {
+      schema.validate(req[key], { abortEarly: false });
+      return next();
+    } catch (err) {
+      const yupError = err as ValidationError;
+      const errors: Record<string, string> = {};
 
-    return res.status(StatusCodes.BAD_REQUEST).json({ errors });
-  }
+      yupError.inner.forEach((error) => {
+        if (!error.path) return;
+
+        errors[error.path] = error.message;
+      });
+
+      return res.status(StatusCodes.BAD_REQUEST).json({ errors });
+    }
+  });
 };
