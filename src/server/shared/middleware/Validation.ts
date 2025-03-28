@@ -4,14 +4,20 @@ import { object, ObjectSchema, ValidationError } from "yup";
 
 type TProperty = "body" | "header" | "params" | "query";
 
+type TGetSchema = <T>(schema: ObjectSchema<T>) => ObjectSchema<T>;
+
 type TAllSchemas = Record<TProperty, ObjectSchema<any>>;
 
-type TValidation = (schemas: Partial<TAllSchemas>) => RequestHandler;
+type TGetAllSchemas = (getSchema: TGetSchema) => Partial<TAllSchemas>;
+
+type TValidation = (schemas: TGetAllSchemas) => RequestHandler;
 
 export const validation: TValidation = (schemas) => async (req, res, next) => {
+  const errorsResult: Record<string, Record<string, string>> = {};
+
   Object.entries(schemas).forEach(([key, schema]) => {
     try {
-      schema.validate(req[key], { abortEarly: false });
+      schema.validateSync(req[key as TProperty], { abortEarly: false });
       return next();
     } catch (err) {
       const yupError = err as ValidationError;
@@ -23,7 +29,13 @@ export const validation: TValidation = (schemas) => async (req, res, next) => {
         errors[error.path] = error.message;
       });
 
-      return res.status(StatusCodes.BAD_REQUEST).json({ errors });
+      errorsResult[key as TProperty] = errors;
     }
   });
+
+  if (Object.entries(errorsResult).length === 0) {
+    return next();
+  } else {
+    return res.status(StatusCodes.BAD_REQUEST).json({ errors: errorsResult });
+  }
 };

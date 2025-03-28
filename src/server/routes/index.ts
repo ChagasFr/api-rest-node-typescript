@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { StatusCodes } from "http-status-codes";
 
 import { CidadesController } from "../controllers/cidades/index";
 
@@ -12,7 +11,6 @@ router.get("/", (_, res) => {
 router.post(
   "/cidades",
   CidadesController.createBodyValidator,
-  CidadesController.createValidation,
   CidadesController.create
 );
 

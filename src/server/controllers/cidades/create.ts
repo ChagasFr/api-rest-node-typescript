@@ -5,21 +5,24 @@ import { validation } from "../../shared/middleware";
 
 interface ICidade {
   nome: string;
+  estado: string;
 }
 interface IFilter {
-  filter: string;
+  filter?: string;
 }
-export const createBodyValidator = validation({
-  body: yup.object().shape({
-    nome: yup.string().required().min(3),
-    estado: yup.string().required().min(2),
-  }),
-
-  query: yup.object().shape({
-    nome: yup.string().required().min(3),
-    estado: yup.string().required().min(2),
-  }),
-});
+export const createBodyValidator = validation((getSchema) => ({
+  body: getSchema<ICidade>(
+    yup.object().shape({
+      nome: yup.string().required().min(3),
+      estado: yup.string().required().min(2),
+    })
+  ),
+  query: getSchema<IFilter>(
+    yup.object().shape({
+      filter: yup.string().optional().min(3),
+    })
+  ),
+}));
 
 export const create: RequestHandler = async (
   req: Request<{}, {}, ICidade>,
