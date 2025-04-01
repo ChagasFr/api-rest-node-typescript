@@ -1,5 +1,9 @@
-import * as create from "./create";
+import { getAllValidation, getAll } from "./GetAll";
+import { createBodyValidator, create } from "./create";
 
 export const CidadesController = {
-  ...create,
+  getAllValidation,
+  getAll,
+  createBodyValidator,
+  create,
 };
