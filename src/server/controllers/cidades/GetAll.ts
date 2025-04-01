@@ -2,25 +2,25 @@ import { Request, RequestHandler, Response } from "express";
 import * as yup from "yup";
 import { validation } from "../../shared/middleware";
 
-interface ICidade {
-  nome: string;
-  estado: string;
+interface IQueryProps {
+  page?: number;
+  limit?: number;
+  filter?: string;
 }
 
-export const createBodyValidator = validation((getSchema) => ({
-  body: getSchema<ICidade>(
+export const getAllValidation = validation((getSchema) => ({
+  query: getSchema<IQueryProps>(
     yup.object().shape({
-      nome: yup.string().required().min(3),
-      estado: yup.string().required().min(3),
+      page: yup.number().notRequired().moreThan(0),
+      limit: yup.number().notRequired().moreThan(0),
+      filter: yup.string().notRequired(),
     })
   ),
 }));
 
-export const create: RequestHandler = async (
-  req: Request<{}, {}, ICidade>,
+export const getAll: RequestHandler = async (
+  _req: Request<{}, {}, {}, IQueryProps>,
   res: Response
 ) => {
-  console.log(req.body.nome);
-
-  return res.send("Creare");
+  return res.send("Create");
 };
