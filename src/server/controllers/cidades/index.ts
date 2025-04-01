@@ -1,9 +1,13 @@
-import { getAllValidation, getAll } from "./GetAll";
-import { createBodyValidator, create } from "./create";
+import * as deleteById from "./DeleteById";
+import * as updateById from "./UpdateById";
+import * as getById from "./GetById";
+import * as create from "./create";
+import * as getAll from "./GetAll";
 
 export const CidadesController = {
-  getAllValidation,
-  getAll,
-  createBodyValidator,
-  create,
+  ...deleteById,
+  ...updateById,
+  ...getById,
+  ...create,
+  ...getAll,
 };
