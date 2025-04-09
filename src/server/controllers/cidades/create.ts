@@ -1,6 +1,7 @@
 import { Request, RequestHandler, Response } from "express";
 import * as yup from "yup";
 import { validation } from "../../shared/middleware";
+import { StatusCodes } from "http-status-codes";
 
 interface ICidade {
   nome: string;
@@ -22,5 +23,5 @@ export const create: RequestHandler = async (
 ) => {
   console.log(req.body.nome);
 
-  return res.send("Creare");
+  return res.status(StatusCodes.CREATED).json(1);
 };
