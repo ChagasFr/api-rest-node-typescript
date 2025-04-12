@@ -1,1 +1,1 @@
-export * from "./cidades";
+export * as CidadesController from "./cidades";
