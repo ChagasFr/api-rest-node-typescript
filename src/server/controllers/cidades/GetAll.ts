@@ -9,12 +9,23 @@ interface IQueryProps {
   limit?: number;
   filter?: string;
 }
+
 export const getAllValidation = validation((getSchema) => ({
   query: getSchema<IQueryProps>(
     yup.object().shape({
-      page: yup.number().notRequired().moreThan(0),
-      limit: yup.number().notRequired().moreThan(0),
-      filter: yup.string().notRequired(),
+      page: yup
+        .number()
+        .notRequired()
+        .moreThan(0)
+        .nullable(false) as yup.NumberSchema<number | undefined>,
+      limit: yup
+        .number()
+        .notRequired()
+        .moreThan(0)
+        .nullable(false) as yup.NumberSchema<number | undefined>,
+      filter: yup.string().notRequired().nullable(false) as yup.StringSchema<
+        string | undefined
+      >,
     })
   ),
 }));
