@@ -5,7 +5,17 @@ export async function up(knex: Knex) {
   return knex.schema
     .createTable(ETableNames.pessoa, (table) => {
       table.bigIncrements("id").primary().index();
-      table.string("nome", 150).index().notNullable();
+      table.string("nomeCompleto").index().notNullable();
+      table.string("email").unique().notNullable();
+
+      table
+        .string("cidadeId")
+        .index()
+        .notNullable()
+        .references("id")
+        .inTable(ETableNames.cidade)
+        .onUpdate("CASCADE")
+        .onDelete("RESTRICT");
 
       table.comment("Tabela poara armazenar as pessoas do sistema.");
     })
