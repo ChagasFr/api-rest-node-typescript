@@ -97,22 +97,14 @@ describe("Usuario - SingUp", () => {
     expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(res1.body).toHaveProperty("errors.body.senha");
   });
-  it("Tenta criar registro com cidadeId inválido", async () => {
-    const res1 = await testServer.post("/pessoas").send({
-      cidadeId: "teste",
+  it("Erro ao cadastrar um usuario com nome muito pequeno", async () => {
+    const res1 = await testServer.post("/cadastrar").send({
+      senha: "123456",
       email: "juca@gmail.com",
-      nomeCompleto: "Juca da Silva",
+      nome: "Ju",
     });
 
     expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
-    expect(res1.body).toHaveProperty("errors.body.cidadeId");
-  });
-  it("Tenta criar registro sem enviar nenhuma propriedade", async () => {
-    const res1 = await testServer.post("/pessoas").send({});
-
-    expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
-    expect(res1.body).toHaveProperty("errors.body.email");
-    expect(res1.body).toHaveProperty("errors.body.cidadeId");
-    expect(res1.body).toHaveProperty("errors.body.nomeCompleto");
+    expect(res1.body).toHaveProperty("errors.body.nome");
   });
 });
