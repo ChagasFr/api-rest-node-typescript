@@ -5,7 +5,9 @@ import { testServer } from "../jest.setup";
 describe("Usuario - SingUp", () => {
   let cidadeId: number | undefined = undefined;
   beforeAll(async () => {
-    const resCidade = await testServer.post("/cidades").send({ nome: "Teste" });
+    const resCidade = await testServer
+      .post("/cadastrar")
+      .send({ nome: "Teste" });
 
     cidadeId = resCidade.body;
   });

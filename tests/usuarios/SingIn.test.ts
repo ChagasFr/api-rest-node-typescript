@@ -3,51 +3,41 @@ import { StatusCodes } from "http-status-codes";
 import { testServer } from "../jest.setup";
 
 describe("Usuario - SingUp", () => {
-  let cidadeId: number | undefined = undefined;
   beforeAll(async () => {
-    const resCidade = await testServer.post("/cidades").send({ nome: "Teste" });
-
-    cidadeId = resCidade.body;
+    await testServer.post("/cadatrar").send({
+      nome: "Jorge",
+      senha: "123456",
+      email: "Jorge@gmail.com",
+    });
   });
 
-  it("Cadastra usuario 1", async () => {
-    const res1 = await testServer.post("/cadastrar").send({
+  it("Faz login", async () => {
+    const res1 = await testServer.post("/entrar").send({
       senha: "123456",
-      nome: "Juca da Silva",
-      email: "jucasilva@gmail.com",
+      email: "Jorge@gmail.com",
     });
 
-    expect(res1.statusCode).toEqual(StatusCodes.CREATED);
-    expect(typeof res1.body).toEqual("number");
+    expect(res1.statusCode).toEqual(StatusCodes.OK);
+    expect(typeof res1.body).toHaveProperty("acessToken");
   });
-  it("Cadastra registro 2", async () => {
-    const res1 = await testServer.post("/cadastrar").send({
-      senha: "123456",
-      nome: "Pedro da Rosa",
-      email: "pedrodarosa@gmail.com",
+  it("Senha errada", async () => {
+    const res1 = await testServer.post("/entrar").send({
+      senha: "1234567",
+      email: "Jorge@gmail.com",
     });
 
-    expect(res1.statusCode).toEqual(StatusCodes.CREATED);
-    expect(typeof res1.body).toEqual("number");
+    expect(res1.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+    expect(res1.body).toEqual("errors.default");
   });
-  it("Erro ao cadastrar um usuario com email duplicado", async () => {
-    const res1 = await testServer.post("/cadastrar").send({
+  it("email errado", async () => {
+    const res1 = await testServer.post("/entrar").send({
       senha: "123456",
-      nome: "Pedro da Rosa",
-      email: "pedroduplicado@gmail.com",
+      email: "Jorgeeeeeeeee@gmail.com",
     });
-    expect(res1.statusCode).toEqual(StatusCodes.CREATED);
-    expect(typeof res1.body).toEqual("number");
-
-    const res2 = await testServer.post("/cadastrar").send({
-      senha: "123456",
-      nome: "Juca da silva",
-      email: "pedroduplicado@gmail.com",
-    });
-    expect(res2.statusCode).toEqual(StatusCodes.INTERNAL_SERVER_ERROR);
-    expect(res2.body).toHaveProperty("errors.default");
+    expect(res1.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+    expect(res1.body).toHaveProperty("errors.default");
   });
-  it("Erro ao cadastrar um usuario sem email", async () => {
+  it("Formato de email Invalido", async () => {
     const res1 = await testServer.post("/cadastrar").send({
       senha: "123456",
       nome: "Pedro da Rosa",
@@ -57,7 +47,7 @@ describe("Usuario - SingUp", () => {
     expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(res1.body).toHaveProperty("errors.body.email");
   });
-  it("Erro ao cadastrar um usuario sem nome", async () => {
+  it("senha muito pequena", async () => {
     const res1 = await testServer.post("/cadastrar").send({
       senha: "123456",
       // nome: "Pedro da Rosa",
@@ -67,7 +57,7 @@ describe("Usuario - SingUp", () => {
     expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(res1.body).toHaveProperty("errors.body.nome");
   });
-  it("Erro ao cadastrar um usuario sem senha", async () => {
+  it("Nao informado a senha", async () => {
     const res1 = await testServer.post("/cadastrar").send({
       // senha: "123456",
       nome: "Pedro da Rosa",
@@ -77,7 +67,7 @@ describe("Usuario - SingUp", () => {
     expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(res1.body).toHaveProperty("errors.body.senha");
   });
-  it("Erro ao cadastrar um usuario com email inválido", async () => {
+  it("Nao informado email", async () => {
     const res1 = await testServer.post("/cadastrar").send({
       senha: "123456",
       nome: "Pedro da Rosa",
@@ -86,25 +76,5 @@ describe("Usuario - SingUp", () => {
 
     expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(res1.body).toHaveProperty("errors.body.email");
-  });
-  it("Erro ao cadastrar um usuario com senha muito pequena", async () => {
-    const res1 = await testServer.post("/cadastrar").send({
-      senha: "123",
-      nome: "Juca da silva",
-      email: "jucasilva@gmail.com",
-    });
-
-    expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
-    expect(res1.body).toHaveProperty("errors.body.senha");
-  });
-  it("Erro ao cadastrar um usuario com nome muito pequeno", async () => {
-    const res1 = await testServer.post("/cadastrar").send({
-      senha: "123456",
-      email: "juca@gmail.com",
-      nome: "Ju",
-    });
-
-    expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
-    expect(res1.body).toHaveProperty("errors.body.nome");
   });
 });
