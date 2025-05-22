@@ -38,20 +38,18 @@ describe("Usuario - SingUp", () => {
     expect(res1.body).toHaveProperty("errors.default");
   });
   it("Formato de email Invalido", async () => {
-    const res1 = await testServer.post("/cadastrar").send({
+    const res1 = await testServer.post("/entrar").send({
       senha: "123456",
-      nome: "Pedro da Rosa",
-      // email: "pedrodarosa@gmail.com",
+      email: "Jorge gmail.com",
     });
 
     expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(res1.body).toHaveProperty("errors.body.email");
   });
   it("senha muito pequena", async () => {
-    const res1 = await testServer.post("/cadastrar").send({
-      senha: "123456",
-      // nome: "Pedro da Rosa",
-      email: "pedrodarosa@gmail.com",
+    const res1 = await testServer.post("/entrar").send({
+      senha: "12",
+      email: "Jorge@gmail.com",
     });
 
     expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -59,9 +57,7 @@ describe("Usuario - SingUp", () => {
   });
   it("Nao informado a senha", async () => {
     const res1 = await testServer.post("/cadastrar").send({
-      // senha: "123456",
-      nome: "Pedro da Rosa",
-      email: "pedrodarosa@gmail.com",
+      email: "Jorge@gmail.com",
     });
 
     expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -70,8 +66,7 @@ describe("Usuario - SingUp", () => {
   it("Nao informado email", async () => {
     const res1 = await testServer.post("/cadastrar").send({
       senha: "123456",
-      nome: "Pedro da Rosa",
-      email: "pedrodarosa gmail.com",
+      nome: "Jorge",
     });
 
     expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
